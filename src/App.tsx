@@ -17,7 +17,7 @@ function HomePage() {
             to="/"
             className="text-2xl font-black tracking-tight text-slate-900"
           >
-            ?JA <span className="text-orange-500">?BA</span>
+            ỌJA <span className="text-orange-500">ỌBA</span>
           </Link>
 
           <nav className="flex items-center gap-2">
@@ -90,7 +90,7 @@ function HomePage() {
             <FeatureCard
               icon={<Truck size={24} />}
               title="For riders"
-              text="Deliver orders and earn through the ?JA ?BA network."
+              text="Deliver orders and earn through the ỌJA ỌBA network."
             />
           </div>
         </section>
@@ -135,7 +135,7 @@ function SimplePage({
           to="/"
           className="text-sm font-semibold text-orange-500 hover:text-orange-600"
         >
-          ? Back to ?JA ?BA
+          ← Back to ỌJA ỌBA
         </Link>
 
         <h1 className="mt-6 text-3xl font-black text-slate-950">
