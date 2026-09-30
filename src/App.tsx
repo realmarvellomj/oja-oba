@@ -2,11 +2,16 @@ import type { ReactNode } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import {
   ArrowRight,
+  LogOut,
   MapPin,
   ShoppingBag,
   Store,
   Truck,
 } from 'lucide-react'
+import SignupPage from './pages/auth/SignupPage'
+import LoginPage from './pages/auth/LoginPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import { useAuth } from './contexts/AuthContext'
 
 function HomePage() {
   return (
@@ -121,6 +126,84 @@ function FeatureCard({
   )
 }
 
+function DashboardPage({
+  title,
+  text,
+}: {
+  title: string
+  text: string
+}) {
+  const { profile, signOut } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Link
+            to="/"
+            className="text-2xl font-black tracking-tight text-slate-900"
+          >
+            ỌJA <span className="text-orange-500">ỌBA</span>
+          </Link>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-bold text-slate-900">
+                {profile?.full_name}
+              </p>
+
+              <p className="text-xs capitalize text-slate-500">
+                {profile?.role}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <LogOut size={16} />
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto flex max-w-7xl items-center justify-center px-6 py-20">
+        <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-widest text-orange-500">
+            ỌJA ỌBA
+          </p>
+
+          <h1 className="mt-4 text-3xl font-black text-slate-950">
+            {title}
+          </h1>
+
+          <p className="mt-4 leading-7 text-slate-600">
+            {text}
+          </p>
+
+          <div className="mt-8 rounded-2xl bg-slate-50 p-5 text-left">
+            <p className="text-sm text-slate-500">Signed in as</p>
+
+            <p className="mt-1 font-semibold text-slate-900">
+              {profile?.full_name}
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+              {profile?.phone}
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 function SimplePage({
   title,
   text,
@@ -153,65 +236,57 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
 
-      <Route
-        path="/login"
-        element={
-          <SimplePage
-            title="Log in"
-            text="Customer, merchant, rider and admin authentication will live here."
-          />
-        }
-      />
+      <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/signup"
-        element={
-          <SimplePage
-            title="Create your account"
-            text="New accounts begin as customers. Merchant and rider onboarding will be handled separately."
-          />
-        }
-      />
+      <Route path="/signup" element={<SignupPage />} />
 
-      <Route
-        path="/customer"
-        element={
-          <SimplePage
-            title="Customer dashboard"
-            text="Nearby stores, products, cart and orders will live here."
-          />
-        }
-      />
+      <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
+        <Route
+          path="/customer"
+          element={
+            <DashboardPage
+              title="Customer dashboard"
+              text="Nearby stores, products, cart and orders will live here."
+            />
+          }
+        />
+      </Route>
 
-      <Route
-        path="/merchant"
-        element={
-          <SimplePage
-            title="Merchant dashboard"
-            text="Store setup, products, orders and merchant operations will live here."
-          />
-        }
-      />
+      <Route element={<ProtectedRoute allowedRoles={['merchant']} />}>
+        <Route
+          path="/merchant"
+          element={
+            <DashboardPage
+              title="Merchant dashboard"
+              text="Store setup, products, orders and merchant operations will live here."
+            />
+          }
+        />
+      </Route>
 
-      <Route
-        path="/rider"
-        element={
-          <SimplePage
-            title="Rider dashboard"
-            text="Onboarding, KYC, deliveries, earnings and availability will live here."
-          />
-        }
-      />
+      <Route element={<ProtectedRoute allowedRoles={['rider']} />}>
+        <Route
+          path="/rider"
+          element={
+            <DashboardPage
+              title="Rider dashboard"
+              text="Onboarding, KYC, deliveries, earnings and availability will live here."
+            />
+          }
+        />
+      </Route>
 
-      <Route
-        path="/admin"
-        element={
-          <SimplePage
-            title="Admin dashboard"
-            text="Applications, approvals, platform operations and audit activity will live here."
-          />
-        }
-      />
+      <Route element={<ProtectedRoute allowedRoles={['admin', 'support']} />}>
+        <Route
+          path="/admin"
+          element={
+            <DashboardPage
+              title="Operations dashboard"
+              text="Applications, approvals, platform operations and audit activity will live here."
+            />
+          }
+        />
+      </Route>
 
       <Route
         path="*"
